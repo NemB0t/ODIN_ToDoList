@@ -1,0 +1,19 @@
+{
+  "name": "odin_todolist",
+  "version": "1.0.0",
+  "description": "This is my submission for the ToDo exercise in the ODIN Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NemB0t/ODIN_ToDoList.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NemB0t/ODIN_ToDoList/issues"
+  },
+  "homepage": "https://github.com/NemB0t/ODIN_ToDoList#readme"
+}
