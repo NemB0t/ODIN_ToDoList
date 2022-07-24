@@ -6,6 +6,9 @@ const bin_img = new Image;
 const tempDivParentTemplate = document.createElement('div');
 tempDivParentTemplate.classList.add('sidebarparent');
 
+const todoTemplate = document.createElement('div');
+todoTemplate.classList.add('todoParent');
+
 //bin_img.src = del_btn_png;
 
 const projectFactorey = (name, todoList) => {
@@ -30,6 +33,11 @@ const displaySidebar = function(pList){
         const tempDiv = document.createElement('div');
         tempDiv.textContent=project.name;
         tempDiv.classList.add('sidebarName');
+        
+        tempDiv.addEventListener('click',()=>{
+            displayToDo(project.todoList);
+        });
+        
         template.appendChild(tempDiv);
         
         if(project.name!="ToDo's")
@@ -60,14 +68,109 @@ const displaySidebar = function(pList){
     sidebar.appendChild(addProjectBTN); 
 };
 
+const projectList = [];
+
+const displayToDo = function(tList){
+    const mid = document.querySelector('.mid');
+    mid.replaceChildren();
+//    console.log(tList);
+    tList.forEach((pValue, pIndex, pArr)=>{
+        const template = todoTemplate.cloneNode(true);
+        
+        const title = document.createElement('div');
+        title.textContent=pValue.title;
+        title.classList.add('todoTitle');
+        template.appendChild(title);
+        
+        const description = document.createElement('div');
+        description.textContent=pValue.description;
+        description.classList.add('todoDescription');
+        template.appendChild(description);
+        
+        const dueDate = document.createElement('div');
+        dueDate.textContent=pValue.dueDate;
+        dueDate.classList.add('todoDueDate');
+        template.appendChild(dueDate);
+        
+        const priority = document.createElement('div');
+        priority.textContent=pValue.priority;
+        priority.classList.add('todoPriority');
+        template.appendChild(priority);
+        
+        const deleteBTN = document.createElement('button');
+        deleteBTN.textContent = "Delete";
+        deleteBTN.classList.add('midDelBtn');
+        deleteBTN.addEventListener("click",()=>{
+            var filtered = tList.filter(function(value, index, arr){ 
+                return value != pValue;
+            });
+            tList=filtered;
+            displayToDo(tList);
+        });
+        template.appendChild(deleteBTN);
+        
+        mid.appendChild(template);
+    });
+    
+    const addTodoBTN = document.createElement('button');
+    addTodoBTN.textContent="Add Task"
+    addTodoBTN.classList.add('addtodobtn');
+    addTodoBTN.addEventListener('click',()=>{
+        openTheForm();
+    });
+    
+    mid.appendChild(addTodoBTN);
+    const addTodo = function(todo){
+        tList.push(todo);
+        displayToDo(tList);
+    }
+};
+
+const todo_form= document.querySelector('#task-form');
+todo_form.addEventListener('submit',handleSubmit);
+function handleSubmit(e) {// add a book to library array when form is submitted
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const formProps = Object.fromEntries(formData);
+    console.log(formProps);
+    const title = formProps.title;
+    const description = formProps.description;
+    const duedate=formProps.duedate;
+    const priority = formProps.priority;
+    const temp = toDoFactory(title,description,duedate,priority);
+    console.log(temp);
+    closeTheForm();
+    todo_form.reset();
+};
 
 const main = function(){
-    const projectList = []
     const defaultProject = projectFactorey("ToDo's",[])
+    const todo= toDoFactory('test','Hope it works','soon','high');
+    defaultProject.todoList.push(todo);
     projectList.push(defaultProject);
 //    const bsasb = projectFactorey("ToDdfsds's",[])
 //    projectList.push(bsasb);
     displaySidebar(projectList);
+    displayToDo(projectList[0].todoList);
+}
+
+function openTheForm() {
+    document.getElementById("popupForm").style.display = "block";
+    blurBg();
+}
+  
+function closeTheForm() {
+    document.getElementById("popupForm").style.display = "none";
+    unBlurBg();
+}
+
+function blurBg(){
+    const container = document.querySelector('.wrapper');
+    container.classList.add('blur');
+}
+function unBlurBg(){
+    const container = document.querySelector('.wrapper');
+    container.classList.remove('blur');
 }
 
 main()

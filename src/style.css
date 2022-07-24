@@ -84,3 +84,32 @@ body {
     background-color: black;
     color: white;
 }
+
+
+/**/
+#popupForm>form{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+}
+
+.formPopup {
+    display: none;
+    position: fixed;
+    left: 45%;
+    top: 25%;
+    background-color: white;
+    border: black solid 1px;
+    border-radius: 5px;
+}
+.blur{
+    filter: blur(8px);
+    pointer-events: none;
+    user-select: none;
+}
+
+#submitbtn{
+    max-width: fit-content;
+    align-self: center;
+}
