@@ -25,9 +25,10 @@ const header = document.querySelector('.header');
 header.textContent = "ToDo List";
 
 const displaySidebar = function(pList){
+//    console.log(pList);
     const sidebar = document.querySelector('.sidebar');
     sidebar.replaceChildren();
-    pList.forEach(project=>{
+    pList.forEach((project, pindex, parr)=>{
         const template= tempDivParentTemplate.cloneNode(true);
         
         const tempDiv = document.createElement('div');
@@ -35,7 +36,8 @@ const displaySidebar = function(pList){
         tempDiv.classList.add('sidebarName');
         
         tempDiv.addEventListener('click',()=>{
-            displayToDo(project.todoList);
+//            console.log(parr[pindex]);
+            displayToDo(parr,pindex);
         });
         
         template.appendChild(tempDiv);
@@ -68,9 +70,11 @@ const displaySidebar = function(pList){
     sidebar.appendChild(addProjectBTN); 
 };
 
-const projectList = [];
 
-const displayToDo = function(tList){
+
+const displayToDo = function(parr,pindex){
+    let tList=parr[pindex].todoList;
+//    console.log(parr[pindex]);
     const mid = document.querySelector('.mid');
     mid.replaceChildren();
 //    console.log(tList);
@@ -105,7 +109,8 @@ const displayToDo = function(tList){
                 return value != pValue;
             });
             tList=filtered;
-            displayToDo(tList);
+            parr[pindex].todoList=tList
+            displayToDo(parr,pindex);
         });
         template.appendChild(deleteBTN);
         
@@ -120,30 +125,33 @@ const displayToDo = function(tList){
     });
     
     mid.appendChild(addTodoBTN);
-    const addTodo = function(todo){
-        tList.push(todo);
-        displayToDo(tList);
-    }
+    
+    const todo_form= document.querySelector('#task-form');
+    todo_form.addEventListener('submit',handleSubmit);
+    function handleSubmit(e) {// add a book to library array when form is submitted
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const formProps = Object.fromEntries(formData);
+//        console.log(formProps);
+        const title = formProps.title;
+        const description = formProps.description;
+        const duedate=formProps.duedate;
+        const priority = formProps.priority;
+        const temp = toDoFactory(title,description,duedate,priority);
+//        console.log(temp);
+        console.log(parr[pindex]);
+        parr[pindex].todoList.push(temp);
+        displayToDo(parr,pindex);
+        closeTheForm();
+        todo_form.reset();
+    };
 };
 
-const todo_form= document.querySelector('#task-form');
-todo_form.addEventListener('submit',handleSubmit);
-function handleSubmit(e) {// add a book to library array when form is submitted
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const formProps = Object.fromEntries(formData);
-    console.log(formProps);
-    const title = formProps.title;
-    const description = formProps.description;
-    const duedate=formProps.duedate;
-    const priority = formProps.priority;
-    const temp = toDoFactory(title,description,duedate,priority);
-    console.log(temp);
-    closeTheForm();
-    todo_form.reset();
-};
+const cancelbtn = document.querySelector('#cancelbtn');
+cancelbtn.addEventListener('click',closeTheForm);
 
 const main = function(){
+    const projectList = [];
     const defaultProject = projectFactorey("ToDo's",[])
     const todo= toDoFactory('test','Hope it works','soon','high');
     defaultProject.todoList.push(todo);
@@ -151,7 +159,7 @@ const main = function(){
 //    const bsasb = projectFactorey("ToDdfsds's",[])
 //    projectList.push(bsasb);
     displaySidebar(projectList);
-    displayToDo(projectList[0].todoList);
+//    displayToDo(projectList,0);
 }
 
 function openTheForm() {
