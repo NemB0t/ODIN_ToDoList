@@ -241,6 +241,6 @@ form{
     position: absolute;
     width: 100%;
     left:0;
-    bottom: -35px;
+    bottom: -65px;
     color: var(--clr-light);
 }
