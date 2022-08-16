@@ -1,187 +1,151 @@
 import './style.css';
-import del_btn_png from './bin.png';
+//import del_btn_png from './bin.png';
 
-const bin_img = new Image;
+const listContainer = document.querySelector('[data-lists]')
+const newListForm = document.querySelector('[data-new-list-form]')
+const newListInput = document.querySelector('[data-new-list-input]')
+const deleteListBtn = document.querySelector('[data-delete-list-btn]')
+const listDisplayContainer = document.querySelector('[data-list-display-container]')
+const listTitleElement = document.querySelector('[data-list-title]')
+const listCountElement = document.querySelector('[data-list-count]')
+const tasksContainer = document.querySelector('[data-tasks]')
+const taskTemplate = document.getElementById('task-template')
+const newTaskForm = document.querySelector('[data-new-task-form]')
+const newTaskInput = document.querySelector('[data-new-task-input]')
+const clearCompleteTasksBtn = document.querySelector('[data-clear-complete-task-btn]')
 
-const tempDivParentTemplate = document.createElement('div');
-tempDivParentTemplate.classList.add('sidebarparent');
+//keys for local storage
+const LOCAL_STORAGE_LIST_KEY = "task.lists"
+const LOCAL_STORAGE_SELECTED_LIST_ID_KEY = "task.selectedListId"
 
-const todoTemplate = document.createElement('div');
-todoTemplate.classList.add('todoParent');
+// Get empty list if not thing is there in local storage
+let lists =JSON.parse(localStorage.getItem(LOCAL_STORAGE_LIST_KEY)) || []
 
-//bin_img.src = del_btn_png;
+// Get the selected list
+let selectedListID = JSON.parse(localStorage.getItem(LOCAL_STORAGE_SELECTED_LIST_ID_KEY))
 
-const projectFactorey = (name, todoList) => {
-  //const sayHello = () => console.log('hello!');
-  return { name, todoList };
-};
+clearCompleteTasksBtn.addEventListener('click',e =>{
+    const selectedList = lists.find(list => list.id === selectedListID)
+    selectedList.tasks = selectedList.tasks.filter(task => !task.complete)
+    saveAndRender()
+})
 
-const toDoFactory = (title, description, dueDate, priority) => {
-  //const sayHello = () => console.log('hello!');
-  return { title, description, dueDate, priority };
-};
+deleteListBtn.addEventListener('click', e =>{
+    lists= lists.filter(list => list.id !== selectedListID)
+    selectedListID = null
+    saveAndRender()
+})
 
-const header = document.querySelector('.header');
-header.textContent = "ToDo List";
+listContainer.addEventListener('click',e=>{
+    if(e.target.tagName.toLowerCase()==='li'){
+        selectedListID=e.target.dataset.listId
+        saveAndRender()
+    }
+})
 
-const displaySidebar = function(pList){
-//    console.log(pList);
-    const sidebar = document.querySelector('.sidebar');
-    sidebar.replaceChildren();
-    pList.forEach((project, pindex, parr)=>{
-        const template= tempDivParentTemplate.cloneNode(true);
-        
-        const tempDiv = document.createElement('div');
-        tempDiv.textContent=project.name;
-        tempDiv.classList.add('sidebarName');
-        
-        tempDiv.addEventListener('click',()=>{
-//            console.log(parr[pindex]);
-            displayToDo(parr,pindex);
-        });
-        
-        template.appendChild(tempDiv);
-        
-        if(project.name!="ToDo's")
-        {
-            const tempDivDelBTN = document.createElement('button');
-            tempDivDelBTN.textContent = "Delete";
-            tempDivDelBTN.classList.add('sidebarDelBtn');
-            tempDivDelBTN.addEventListener("click",()=>{
-                var filtered = pList.filter(function(value, index, arr){ 
-                    return value != project;
-                });
-                pList=filtered;
-                displaySidebar(pList);
-            });
-            template.appendChild(tempDivDelBTN);
+tasksContainer.addEventListener('click', e => {
+    if(e.target.tagName.toLowerCase()==='input'){
+        const selectedList = lists.find(list => list.id === selectedListID)
+        const selectedTask = selectedList.tasks.find(task => task.id === e.target.id)
+        selectedTask.complete=e.target.checked
+        save()
+        renderTaskCount(selectedList)
+    }
+})
+
+newListForm.addEventListener('submit',e=>{
+    e.preventDefault()
+    const listName = newListInput.value
+    if(listName == null || listName === '') return
+    const list = createList(listName)
+    newListInput.value = null
+    lists.push(list)
+    saveAndRender()
+})
+
+newTaskForm.addEventListener('submit',e=>{
+    e.preventDefault()
+    const taskName = newTaskInput.value
+    if(taskName == null || taskName === '') return
+    const task = createtask(taskName)
+    newTaskInput.value = null
+    
+    const selectedList = lists.find(list => list.id === selectedListID)
+    selectedList.tasks.push(task)
+    saveAndRender()
+})
+
+function createtask(name){
+    return {id: Date.now().toString() , name: name, complete : false}
+}
+
+function createList(name){
+    return {id: Date.now().toString() , name: name, tasks: []}
+}
+
+function saveAndRender(){
+    save()
+    render()
+}
+
+function save(){
+    localStorage.setItem(LOCAL_STORAGE_LIST_KEY,JSON.stringify(lists))
+    localStorage.setItem(LOCAL_STORAGE_SELECTED_LIST_ID_KEY, JSON.stringify(selectedListID))
+}
+
+function render(){
+    clearElements(listContainer)
+    renderLists()
+    
+    const selectedList = lists.find(list => list.id === selectedListID)
+    
+    if(selectedListID===null){
+        listDisplayContainer.style.display = 'none'
+    }
+    else{
+        listDisplayContainer.style.display = ''
+        listTitleElement.innerText = selectedList.name
+        renderTaskCount(selectedList)
+        clearElements(tasksContainer)
+        renderTasks(selectedList)
+    }
+}
+
+function renderTasks(selectedList){
+    selectedList.tasks.forEach(task =>{
+        const taskElement = document.importNode(taskTemplate.content,true)
+        const checkbox = taskElement.querySelector('input')
+        checkbox.id = task.id
+        checkbox.checked = task.complete
+        const label = taskElement.querySelector('label')
+        label.htmlFor = task.id
+        label.append(task.name)
+        tasksContainer.appendChild(taskElement)
+    })
+}
+
+function renderTaskCount(selectedList){
+    const incompleteTaskCount = selectedList.tasks.filter(task => !task.complete).length
+    const taskString = incompleteTaskCount===1 ? 'task':'tasks'
+    listCountElement.innerText = `${incompleteTaskCount} ${taskString} remaining`
+}
+function renderLists(){
+    lists.forEach(list => {
+        const listElement = document.createElement('li')
+        listElement.classList.add("list-name")
+        listElement.dataset.listId = list.id
+        listElement.innerText = list.name
+        if (list.id === selectedListID){
+            listElement.classList.add("active-list")
         }
-        sidebar.appendChild(template);       
-    });
-    const addProjectBTN = document.createElement('button');
-    addProjectBTN.textContent="Add Project"
-    addProjectBTN.classList.add('addprojectbtn');
-    addProjectBTN.addEventListener("click",()=>{
-        const pname = prompt('Enter the name of the Project');
-        const newProject= projectFactorey(pname,[]);
-        pList.push(newProject);
-        displaySidebar(pList);
-    });
-    sidebar.appendChild(addProjectBTN); 
-};
-
-
-
-const displayToDo = function(parr,pindex){
-    let tList=parr[pindex].todoList;
-//    console.log(parr[pindex]);
-    const mid = document.querySelector('.mid');
-    mid.replaceChildren();
-//    console.log(tList);
-    tList.forEach((pValue, pIndex, pArr)=>{
-        const template = todoTemplate.cloneNode(true);
-        
-        const title = document.createElement('div');
-        title.textContent=pValue.title;
-        title.classList.add('todoTitle');
-        template.appendChild(title);
-        
-        const description = document.createElement('div');
-        description.textContent=pValue.description;
-        description.classList.add('todoDescription');
-        template.appendChild(description);
-        
-        const dueDate = document.createElement('div');
-        dueDate.textContent=pValue.dueDate;
-        dueDate.classList.add('todoDueDate');
-        template.appendChild(dueDate);
-        
-        const priority = document.createElement('div');
-        priority.textContent=pValue.priority;
-        priority.classList.add('todoPriority');
-        template.appendChild(priority);
-        
-        const deleteBTN = document.createElement('button');
-        deleteBTN.textContent = "Delete";
-        deleteBTN.classList.add('midDelBtn');
-        deleteBTN.addEventListener("click",()=>{
-            var filtered = tList.filter(function(value, index, arr){ 
-                return value != pValue;
-            });
-            tList=filtered;
-            parr[pindex].todoList=tList
-            displayToDo(parr,pindex);
-        });
-        template.appendChild(deleteBTN);
-        
-        mid.appendChild(template);
-    });
-    
-    const addTodoBTN = document.createElement('button');
-    addTodoBTN.textContent="Add Task"
-    addTodoBTN.classList.add('addtodobtn');
-    addTodoBTN.addEventListener('click',()=>{
-        openTheForm();
-    });
-    
-    mid.appendChild(addTodoBTN);
-    
-    const todo_form= document.querySelector('#task-form');
-    todo_form.addEventListener('submit',handleSubmit);
-    function handleSubmit(e) {// add a book to library array when form is submitted
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const formProps = Object.fromEntries(formData);
-//        console.log(formProps);
-        const title = formProps.title;
-        const description = formProps.description;
-        const duedate=formProps.duedate;
-        const priority = formProps.priority;
-        const temp = toDoFactory(title,description,duedate,priority);
-//        console.log(temp);
-        console.log(parr[pindex]);
-        parr[pindex].todoList.push(temp);
-        displayToDo(parr,pindex);
-        closeTheForm();
-        todo_form.reset();
-    };
-};
-
-const cancelbtn = document.querySelector('#cancelbtn');
-cancelbtn.addEventListener('click',closeTheForm);
-
-const main = function(){
-    const projectList = [];
-    const defaultProject = projectFactorey("ToDo's",[])
-    const todo= toDoFactory('test','Hope it works','soon','high');
-    defaultProject.todoList.push(todo);
-    projectList.push(defaultProject);
-//    const bsasb = projectFactorey("ToDdfsds's",[])
-//    projectList.push(bsasb);
-    displaySidebar(projectList);
-//    displayToDo(projectList,0);
+        listContainer.appendChild(listElement)
+    })
 }
 
-function openTheForm() {
-    document.getElementById("popupForm").style.display = "block";
-    blurBg();
-}
-  
-function closeTheForm() {
-    document.getElementById("popupForm").style.display = "none";
-    unBlurBg();
+function clearElements(element){
+    while(element.firstChild){
+        element.removeChild(element.firstChild)
+    }
 }
 
-function blurBg(){
-    const container = document.querySelector('.wrapper');
-    container.classList.add('blur');
-}
-function unBlurBg(){
-    const container = document.querySelector('.wrapper');
-    container.classList.remove('blur');
-}
-
-main()
-
-// const wrapper = document.querySelector('.header');
-// wrapper.style.backgroundColor = "red";
+render()
