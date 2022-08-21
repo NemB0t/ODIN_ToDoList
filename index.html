@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ToDoList</title>
     <script src="./main.js" defer></script>
-<!--    <link rel="stylesheet" href="./style.css">-->
+   <!-- <link rel="stylesheet" href="./styletemp.css"> -->
 </head>
 <body>
     <h1 class="title">To Do App</h1>
@@ -26,11 +26,66 @@
         </div>
 
         <div class="todo-body">
-            <div class="task-container" data-tasks></div>
+            <div class="task-container" data-tasks>
+                <div class="tasks">
+                    <input 
+                      type="checkbox"
+                      id="task-1"
+                    />
+                    <label for="task-1">
+                      <span class="custom-checkbox"></span>
+                      record todo list video
+                    </label>
+                    <div class="secData">
+                      <div class="date">2013-01-08</div>
+                      <div class="prio">High</div>
+                    </div>
+                  </div>
+                  <!-- /task-1 -->
+        
+                  <div class="tasks">
+                      <input 
+                        type="checkbox"
+                        id="task-2"
+                      />
+                      <label for="task-2">
+                        <span class="custom-checkbox"></span>
+                        another task
+                      </label>
+                      <div class="secData">
+                        <div class="date">2013-01-08</div>
+                        <div class="prio">Medium</div>
+                      </div>
+                    </div>
+                    <!-- /task-2 -->
+        
+                    <div class="tasks">
+                        <input 
+                          type="checkbox"
+                          id="task-3"
+                        />
+                        <label for="task-3">
+                          <span class="custom-checkbox"></span>
+                          a third task
+                        </label>
+                        <div class="secData">
+                          <div class="date">2013-01-08</div>
+                          <div class="prio">Low</div>
+                        </div>
+                      </div>
+                      <!-- /task-3 -->
+            </div>
             <div class="new-task-creator">
-
-                <form action="" data-new-task-form>
+                <form action="" data-new-task-form class="task-creation-form">
                     <input type="text" class="new task" placeholder="new task name" aria-label="new task name" data-new-task-input />
+                    <div class="new-input">
+                      <input type="date" class="taskDate" data-new-task-date>
+                      <select name="priority" id="taskPrio" class="taskPriority" data-new-task-prio>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                      </select>
+                    </div>
                     <button class="btn create" aria-label="create task list">+</button>
                 </form>
 
@@ -47,6 +102,8 @@
             <label>
                 <span class="custom-checkbox"></span>
             </label>
+            <div class="date"></div>
+            <div class="prio"></div>
         </div>
     </template>
 </body>
