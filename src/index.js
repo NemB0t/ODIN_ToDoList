@@ -1,5 +1,6 @@
 import './style.css';
-import { format, compareAsc } from 'date-fns'
+import { format} from 'date-fns'
+// import { format, compareAsc } from 'date-fns'
 //import del_btn_png from './bin.png';
 
 const listContainer = document.querySelector('[data-lists]')
@@ -27,13 +28,13 @@ let lists =JSON.parse(localStorage.getItem(LOCAL_STORAGE_LIST_KEY)) || []
 // Get the selected list
 let selectedListID = JSON.parse(localStorage.getItem(LOCAL_STORAGE_SELECTED_LIST_ID_KEY))
 
-clearCompleteTasksBtn.addEventListener('click',e =>{
+clearCompleteTasksBtn.addEventListener('click',() =>{
     const selectedList = lists.find(list => list.id === selectedListID)
     selectedList.tasks = selectedList.tasks.filter(task => !task.complete)
     saveAndRender()
 })
 
-deleteListBtn.addEventListener('click', e =>{
+deleteListBtn.addEventListener('click', () =>{
     lists= lists.filter(list => list.id !== selectedListID)
     selectedListID = null
     saveAndRender()
