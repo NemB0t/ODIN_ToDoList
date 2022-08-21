@@ -12,6 +12,8 @@ const tasksContainer = document.querySelector('[data-tasks]')
 const taskTemplate = document.getElementById('task-template')
 const newTaskForm = document.querySelector('[data-new-task-form]')
 const newTaskInput = document.querySelector('[data-new-task-input]')
+const newTaskDate = document.querySelector('[data-new-task-date]')
+const newTaskPrio = document.querySelector('[data-new-task-prio]')
 const clearCompleteTasksBtn = document.querySelector('[data-clear-complete-task-btn]')
 
 //keys for local storage
@@ -69,6 +71,7 @@ newTaskForm.addEventListener('submit',e=>{
     if(taskName == null || taskName === '') return
     const task = createtask(taskName)
     newTaskInput.value = null
+    // console.log(newTaskDate.value)
     
     const selectedList = lists.find(list => list.id === selectedListID)
     selectedList.tasks.push(task)
