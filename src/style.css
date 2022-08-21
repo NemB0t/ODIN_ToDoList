@@ -12,6 +12,13 @@
     box-sizing: border-box;
 }
 
+html {
+height: 100%;
+}
+body {
+min-height: 100%;
+}
+
 body{
     margin: 0;
     font-family: "Work Sans", sans-serif;
@@ -21,9 +28,17 @@ body{
     color: var(--clr-light);
     display: grid;
     grid:
-        "header header header header" auto
-        "...... lists  active ......" auto/
+        "header header header header" 140px
+        "...... lists  active ......" auto
+        "...... footer footer ......" auto/
         1fr minmax(100px,300px) minmax(350px,600px) 1fr;
+}
+
+.footer{
+    grid-area: footer;
+    justify-self: center;
+    align-self: flex-end;
+    bottom: 0;
 }
 
 .title{
@@ -174,10 +189,11 @@ form{
 .new-task-creator .create{
     color: var(--clr-primary);
 }
-
+.todo-list{
+    position: relative;
+}
 .todo-body{
     padding: var(--spacer);
-    position: relative;
 }
 
 .secData{
@@ -287,6 +303,6 @@ form{
     position: absolute;
     width: 100%;
     left:0;
-    bottom: -65px;
+    bottom: -30px;
     color: var(--clr-light);
 }
