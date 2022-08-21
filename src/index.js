@@ -1,4 +1,5 @@
 import './style.css';
+import { format, compareAsc } from 'date-fns'
 //import del_btn_png from './bin.png';
 
 const listContainer = document.querySelector('[data-lists]')
@@ -68,18 +69,35 @@ newListForm.addEventListener('submit',e=>{
 newTaskForm.addEventListener('submit',e=>{
     e.preventDefault()
     const taskName = newTaskInput.value
+    let taskDate = newTaskDate.value
+    const taskPrio = newTaskPrio.value
+    taskDate=processDateData(taskDate)
+    console.log(taskDate)
     if(taskName == null || taskName === '') return
-    const task = createtask(taskName)
+    const task = createtask(taskName,taskDate,taskPrio)    
+    console.log(taskPrio)
     newTaskInput.value = null
-    // console.log(newTaskDate.value)
+    newTaskDate.value = null
+    console.log(task)
     
     const selectedList = lists.find(list => list.id === selectedListID)
     selectedList.tasks.push(task)
     saveAndRender()
 })
 
-function createtask(name){
-    return {id: Date.now().toString() , name: name, complete : false}
+function processDateData(date){
+    let formattedDate;
+    if(!date){
+        formattedDate = "No Due Date";
+    }
+    else{
+        formattedDate = format(new Date(date), 'yyyy-MM-dd')
+    }
+    return formattedDate;
+}
+
+function createtask(name,taskDate,taskPrio){
+    return {id: Date.now().toString() , name: name, complete : false, endDate: taskDate,prio: taskPrio}
 }
 
 function createList(name){
@@ -118,11 +136,26 @@ function renderTasks(selectedList){
     selectedList.tasks.forEach(task =>{
         const taskElement = document.importNode(taskTemplate.content,true)
         const checkbox = taskElement.querySelector('input')
+        const taskPriority = task.prio
         checkbox.id = task.id
         checkbox.checked = task.complete
         const label = taskElement.querySelector('label')
         label.htmlFor = task.id
         label.append(task.name)
+        const templateDate = taskElement.querySelector('.date')
+        templateDate.innerText = task.endDate
+        const templatePrio= taskElement.querySelector('.prio')
+        templatePrio.innerText=taskPriority
+        if(taskPriority==="Low"){
+            templatePrio.style.color = 'green'
+        }
+        else if(taskPriority==="Medium"){
+            templatePrio.style.color = 'orange'
+        }
+        else if(taskPriority==="High"){
+            templatePrio.style.color = 'red'
+        }
+
         tasksContainer.appendChild(taskElement)
     })
 }
